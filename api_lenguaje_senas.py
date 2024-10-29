@@ -10,7 +10,7 @@ import numpy as np
 app = FastAPI()
 
 # Configuración de CORS
-origins = ["http://35.160.120.126:5500"]  # Especifica el origen permitido
+origins = ["https://proyecto-manos.onrender.com"]  # Especifica el origen permitido
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -80,4 +80,4 @@ async def recognize_sign(file: UploadFile = File(...)):
 # Para correr la API en local
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="35.160.120.126", port=5500)
+    uvicorn.run(app, host="0.0.0.0", port=5500)
