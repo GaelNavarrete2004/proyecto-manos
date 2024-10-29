@@ -21,7 +21,7 @@ app.add_middleware(
 )
 
 # Cargar el modelo de lenguaje de señas
-model_dict = pickle.load(open('./model.p', 'rb'))
+model_dict = pickle.load(open('model.p', 'rb'))
 model = model_dict['model']
 
 # Configuración de MediaPipe para detección de manos
