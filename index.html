@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reconocimiento de Lenguaje de Señas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f8ff;
+            margin: 0;
+            height: 100vh;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        video {
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #output {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            width: 300px;
+            text-align: center;
+            background-color: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Reconocimiento de Lenguaje de Señas</h1>
+    <video id="video" width="640" height="480" autoplay></video>
+    <button id="start" onclick="startRecognition()">Iniciar Reconocimiento</button>
+    <p id="output">Carácter Reconocido: Ninguno</p>
+
+    <script>
+        const video = document.getElementById('video');
+        const output = document.getElementById('output');
+        let isRecognizing = false;
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (error) {
+                console.error("Error al acceder a la cámara:", error);
+            }
+        }
+
+        async function captureFrameAndSend() {
+            if (!isRecognizing) return;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+
+            const formData = new FormData();
+            formData.append("file", blob, "frame.jpg");
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/recognize-sign", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
+                output.innerText = `Carácter Reconocido: ${data.recognized_text}`;
+            } catch (error) {
+                console.error("Error al enviar el fotograma:", error);
+            }
+
+            setTimeout(captureFrameAndSend, 1000); // 1 segundo entre capturas
+        }
+
+        function startRecognition() {
+            isRecognizing = !isRecognizing;
+            if (isRecognizing) {
+                output.innerText = "Reconociendo...";
+                captureFrameAndSend();
+            } else {
+                output.innerText = "Reconocimiento detenido.";
+            }
+        }
+
+        startCamera();
+    </script>
+</body>
+</html>
