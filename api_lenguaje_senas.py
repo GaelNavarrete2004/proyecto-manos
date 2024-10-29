@@ -9,8 +9,9 @@ import numpy as np
 # Configuración de la API
 app = FastAPI()
 
-# Configuración de CORS
-origins = ["https://proyecto-manos.onrender.com"]  # Especifica el origen permitido
+origins = ["https://gaelnavarrete2004.github.io/proyecto-manos/"]
+
+# Configuración de CORS 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
