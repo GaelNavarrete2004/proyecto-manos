@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pickle
@@ -75,6 +75,11 @@ async def recognize_sign(file: UploadFile = File(...)):
         return {"recognized_text": predicted_character}
     
     return {"recognized_text": "No se detectaron manos en la imagen"}
+
+# Endpoint para monitorear si el servidor está activo
+@app.head("/monitor")
+async def monitorAwake():
+    return Response(status_code=200)
 
 # Para correr la API en local
 if __name__ == "__main__":
